@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -86,12 +87,16 @@ public class EmpleadoControladorTest {
         mockMvc.perform(post("/api/empleados")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(nuevo)))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.nombre").value("Marcos"));
     }
 
     @Test
     void eliminarEmpleado_DeberiaRetornarNoContent() throws Exception {
+        Empleado e = new Empleado(1L, "Marta", "Finanzas", 2800.0);
+        when(empleadoServicio.obtenerEmpleadoPorId(1L)).thenReturn(e);
+        doNothing().when(empleadoServicio).eliminarEmpleado(1L);
+
         mockMvc.perform(delete("/api/empleados/1"))
                 .andExpect(status().isNoContent());
     }
